@@ -15,6 +15,16 @@ class Route {
   int freq;
   Route();
 
+  struct day_sched {
+    int start;
+    int end;
+    int freq;
+    day_sched(std::string s, std::string e, std::string f)
+      : start(stoi(s)), end(stoi(e)), freq(stoi(f)) {};
+  };
+  
+  day_sched scheds[7];
+
   struct route_stop {
     Stop stop;
     int time;
