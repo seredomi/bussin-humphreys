@@ -3,37 +3,38 @@
 
 #include <iostream>
 #include <string>
-#include <pair>
 #include <set>
 
 #include "stop.h"
 
 class Route {
+  public:
   std::string name;
   int first;
   int last;
   int freq;
+  Route();
 
   struct route_stop {
     Stop stop;
     int time;
     
     // all the definitions required to use route_stop in a set
-    struct() : stop(Stop()), time(0) {};
-    struct(Stop s, int t) : stop(s), time(t) {};
-    struct(const struct& rs) : stop(rs.stop), time(rs.time) {};
-    struct& operator=(const struct& rs) {
+    route_stop() : stop(Stop()), time(0) {};
+    route_stop(Stop s, int t) : stop(s), time(t) {};
+    route_stop(const route_stop& rs) : stop(rs.stop), time(rs.time) {};
+    route_stop& operator=(const route_stop& rs) {
       stop = rs.stop;
       time = rs.time;
       return *this;
     }
-    bool operator<(const struct& rs) const {
+    bool operator<(const route_stop& rs) const {
       return time < rs.time;
     }
   };
 
   // set of stops on the route
   std::set<route_stop> route_stops;
-}
+};
 
 #endif
