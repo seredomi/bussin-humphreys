@@ -112,6 +112,7 @@ double time_bw_pts(Stop &p1, Stop &p2) {
   double dlon = (p2.lon - p1.lon) * M_PI / 180;
   // 12.5 is average walking speed m/km, 6371 is radius of earth in km
   return 2 * 12.5 * 6371 * asin(sqrt(pow(sin((dlat) / 2), 2) + cos(p1.lat) * cos(p2.lat) * pow(sin((dlon) / 2), 2)));
+}
 
  
 int main() {
