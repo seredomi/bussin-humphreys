@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 #include <sstream>
-#include <regex>
+#include <math.h>
 
 #include "stop.h"
 #include "route.h"
@@ -106,8 +106,12 @@ vector<Route> make_routes(set<Stop> &stops) {
 }
 
 
-
-
+// Haversine formula
+double time_bw_pts(Stop &p1, Stop &p2) {
+  double dlat = (p2.lat - p1.lat) * M_PI / 180;
+  double dlon = (p2.lon - p1.lon) * M_PI / 180;
+  // 12.5 is average walking speed m/km, 6371 is radius of earth in km
+  return 2 * 12.5 * 6371 * asin(sqrt(pow(sin((dlat) / 2), 2) + cos(p1.lat) * cos(p2.lat) * pow(sin((dlon) / 2), 2)));
 
  
 int main() {
@@ -116,9 +120,11 @@ int main() {
   if (stops.empty()) return 1;
   vector<Route> routes = make_routes(stops);
   if (routes.empty()) return 1;
-  for (auto r : routes) cout << r << '\n';
 
+  Stop s1 = *stops.find(Stop("PVC-W"));
+  Stop s2 = *stops.find(Stop("PG"));
 
+  cout << time_bw_pts(s1, s2) << '\n';
 
 
 
