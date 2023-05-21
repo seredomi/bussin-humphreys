@@ -12,6 +12,7 @@ class Stop {
     long double lat;
     long double lon;
     Stop();
+    Stop(std::string);
     Stop(std::string, std::string, std::string, std::string, std::string);
     Stop(const Stop&);
     Stop & operator=(const Stop&);
@@ -19,7 +20,7 @@ class Stop {
 };
 
 std::ostream& operator<<(std::ostream& os, const Stop& s) {
-  os << s.id << " " << s.name << " " << s.desc << "\n  " << s.lat << " " << s.lon;
+  os << s.id << " " << s.name << " " << s.desc << " " << s.lat << " " << s.lon;
   return os;
 }
 
