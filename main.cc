@@ -10,15 +10,14 @@
 using namespace std;
 
 // default constructor
-Stop::Stop() : id(""), stop_id(""), name(""), desc(""), lat(0), lon(0) {};
+Stop::Stop() : stop_id(""), desc(""), id(""), name(""), lat(0), lon(0) {};
 
 // actual constructor
 Stop::Stop(string i, string d, string n, string la, string lo) {
   stop_id = i;
   id = i + d;
-  for (char& c : n) if (c == '_') c = ' ';
   name = n;
-  if (d == "X") desc = "";
+  if (d == "") desc = "";
   else if (d == "N") desc = "Northern roadside";
   else if (d == "S") desc = "Southern roadside";
   else if (d == "E") desc = "Eastern roadside";
@@ -54,22 +53,25 @@ bool Stop::operator<(const Stop& rhs) const {
 }
   
 int main() {
-  // open stops.txt
-  ifstream ifs("stops.txt");
+  // open stops.csv
+  ifstream ifs("stops.csv");
   if (!ifs) {
-    cout << "Error opening stops.txt\n";
+    cout << "Error opening stops.csv\n";
     return 1;
   }
+
   set<Stop> stops;
   string line;
-  // for each line in stops, split line by whitespace, initialize stop, insert in stops set
+  // for each line in stops.csv, split line by commas, initialize stop, insert in stops set
   while (getline(ifs, line)) {
     stringstream ss(line);
     vector<string> args;
     string arg;
-    while (ss >> arg) args.push_back(arg);
+    while (getline(ss, arg, ',')) args.push_back(arg);
     stops.insert(Stop(args[0], args[1], args[2], args[3], args[4]));
   }
+  ifs.close();
+
   // print out stops
   cout.precision(20);
   int i = 0;
