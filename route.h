@@ -44,7 +44,6 @@ class Route {
   std::set<route_stop> route_stops;
 };
 
-
 std::ostream & operator<<(std::ostream &os, const Route &r) {
   os << r.name << "\n  ";
   for (auto s : r.scheds) {
