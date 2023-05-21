@@ -1,3 +1,6 @@
+#ifndef STOP_H
+#define STOP_H
+
 #include <string>
 #include <iostream>
 
@@ -19,3 +22,5 @@ std::ostream& operator<<(std::ostream& os, const Stop& s) {
   os << s.id << " " << s.name << " " << s.desc << "\n  " << s.lat << " " << s.lon;
   return os;
 }
+
+#endif
