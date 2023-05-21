@@ -38,18 +38,15 @@ Stop& Stop::operator=(const Stop& rhs) {
 // less than operator
 bool Stop::operator<(const Stop& rhs) const { return id < rhs.id; }
 
- 
-int main() {
 
-  cout.precision(20);
-
+set<Stop> make_stops() {
+  set<Stop> stops;
   // open stops.csv, construct stops set
   ifstream ifs("stops.csv");
   if (!ifs) {
     cout << "Error opening stops.csv\n";
-    return 1;
+    return stops;
   }
-  set<Stop> stops;
   string line;
   // each line is stops.csv is of the form: id,name,desc,lat,lon
   // for each line in stops.csv, split line by commas, initialize stop, insert in stops set
@@ -61,18 +58,22 @@ int main() {
     stops.insert(Stop(args[0], args[2], args[1], args[3], args[4]));
   }
   ifs.close();
+  return stops;
+}
 
+
+vector<Route> make_routes(set<Stop> &stops) {
+  vector<Route> routes;
+  ifstream ifs("routes.csv");
+  if (!ifs) {
+    cout << "Error opening routes.csv\n";
+    return routes;
+  }
+  string line;
   // each line in routes.csv is of the form:
   // routename,monstart-end freq, tuestart-end freq, ... sunstart-end freq, stop1 stop1time, stop2 stop2time, ...
   // open routes.csv, construct routes vector
-  ifs.open("routes.csv");
-  if (!ifs) {
-    cout << "Error opening routes.csv\n";
-    return 1;
-  }
-  vector<Route> routes;
   while (getline(ifs, line)) {
-    cout << line << '\n';
     stringstream ss(line);
     string arg;
     getline(ss, arg, ',');
@@ -92,7 +93,8 @@ int main() {
         auto it = stops.find(query);
         if (it == stops.end()) {
           cout << "Error: " << " route " << r.name << " " << arg.substr(0, arg.find(" ")) << " not found" << '\n';
-          return 1;
+
+          vector<Route> empty; return empty;
         }
         r.route_stops.insert(Route::route_stop(*it, arg.substr(arg.find(" ")+1)));
       }
@@ -100,8 +102,25 @@ int main() {
     routes.push_back(r);
   }
   ifs.close();
+  return routes;
+}
 
+
+
+
+
+ 
+int main() {
+
+  set<Stop> stops = make_stops();
+  if (stops.empty()) return 1;
+  vector<Route> routes = make_routes(stops);
+  if (routes.empty()) return 1;
   for (auto r : routes) cout << r << '\n';
+
+
+
+
 
   return 0;
 }
