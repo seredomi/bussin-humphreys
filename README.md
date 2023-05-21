@@ -11,6 +11,7 @@ Here's the plan:
 - [x] collect route info including schedule, stupos, and timing (I ride the buses repeatedly and use an app called GPX Tracker Pro to record their movements)
 - [x] distill all this info into CSV files that can be edited later on to reflect changes
 - [x] program reads these files and creates useful and efficient data structures out of them
+- [ ] program finds possible paths between bus stops
 - [ ] program returns possible routes where bus stops are within 2km of start/end coords
 - [ ] program that sorts these possible routes
 - [ ] simple webapp to interact with these algorithms
