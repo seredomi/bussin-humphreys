@@ -9,10 +9,10 @@ EA-W,W,Eight Army,36.96558501,127.0313072
 EA-E,E,Eight Army,36.96558501,127.0313072
 CE-E,E,Corps of Engineers,36.97272969,127.0219088
 CE-W,W,Corps of Engineers,36.97272969,127.0219088
-TMP-S,"S6148, South side of the road",TMP,36.967626,127.016072
-TMP-N,"S7006, North side of the road",TMP,36.967711,127.016704
-AO-N,"Signpost, North side of the road",Airfield Operations,36.964765,127.020827
-AO-S,"Signpost, South side of the road",Airfield Operations,36.964667,127.020612
+TMP-S,S6148; South side of the road,TMP,36.967626,127.016072
+TMP-N,S7006; North side of the road,TMP,36.967711,127.016704
+AO-N,Signpost; North side of the road,Airfield Operations,36.964765,127.020827
+AO-S,Signpost; South side of the road,Airfield Operations,36.964667,127.020612
 TG-E,East side of the road,Turner Fitness Center,36.960703,127.02463
 TG-W,West side of the road,Turner Fitness Center,36.961411,127.024033
 CCF-E,E,Collier Community Fitness Center,36.96067721,127.0245427
@@ -30,27 +30,27 @@ JC-E,E,MSG Henry L. Jenkins Medical Clinic,36.94880287,127.0235127
 JC-W,W,MSG Henry L. Jenkins Medical Clinic,36.94880287,127.0235127
 FH-W,N,Family Housing Towers (5050/5070s),36.95743231,127.0197576
 FH-E,S,Family Housing Towers (5050/5070s),36.9582982,127.0182931
-TC-N,"Signpost, Northwest side of the intersection",Talon Cafe,36.961177,127.020099
-TC-S,"Signpost, Southwest side of ithe ntersection",Talon Cafe,36.961025,127.019884
-B1-N,"S6020, North side of road",Barracks (6000s),36.962636,127.015504
-B1-S,"S2214, South side of road",Barracks (6000s),36.962521,127.015639
-PVC-W,"S6363, West side of the road",Pacific Victors Chapel,36.966418,127.010049
-PVC-E,"S6290, East side of the road",Pacific Victors Chapel,36.966756,127.01049
-SD-N,"Signpost, North side of the road",Spartan DFAC,36.970456,127.00827
-SD-S,"Signpost, South side of the road",Spartan DFAC,36.970283,127.008248
-PD-N,"Signpost, North side of the road",Pittman DFAC,36.97378,126.998288
-PD-S,"Signpost, South side of the road",Pittman DFAC,36.973446,126.998562
-BSF,"S6689, East side of the road",Balboni Sports Field Complex,36.970757,126.995163
-C-E,"S5663, East side of road",Commissary,36.964028,127.003231
-C-W,"Signpost, West side of the road",Commissary,36.963908,127.002963
-PX-E,"S5725, East side of the road",Main Exchange,36.965533,126.998282
-PX-W,"S5653, West side of the road",Main Exchange,36.965613,126.998132
-PO-N,"Signpost, North side of the road",Main Post Office,36.963076,127.000019
-PO-S,"Signpost, South side of the road",Main Post Office,36.962876,127.000064
-MH-E,"S6383, East side of the road",LTG Timothy J. Maude Hall,36.967866,127.005198
-MH-W,"Signpost, West side of the road",LTG Timothy J. Maude Hall,36.967849,127.005019
-SG-N,"Signpost, North side of the road",Sitman Fitness Center,36.975504,126.993163
-SG-S,"Signpost, South side of the road",Sitman Fitness Center,36.975214,126.993224
-2S,"Signpost, North side of the road",2ID Sustainment,36.97663,126.989668
+TC-N,Signpost; Northwest side of the intersection,Talon Cafe,36.961177,127.020099
+TC-S,Signpost; Southwest side of ithe ntersection,Talon Cafe,36.961025,127.019884
+B1-N,S6020; North side of road,Barracks (6000s),36.962636,127.015504
+B1-S,S2214; South side of road,Barracks (6000s),36.962521,127.015639
+PVC-W,S6363; West side of the road,Pacific Victors Chapel,36.966418,127.010049
+PVC-E,S6290; East side of the road,Pacific Victors Chapel,36.966756,127.01049
+SD-N,Signpost; North side of the road,Spartan DFAC,36.970456,127.00827
+SD-S,Signpost; South side of the road,Spartan DFAC,36.970283,127.008248
+PD-N,Signpost; North side of the road,Pittman DFAC,36.97378,126.998288
+PD-S,Signpost; South side of the road,Pittman DFAC,36.973446,126.998562
+BSF,S6689; East side of the road,Balboni Sports Field Complex,36.970757,126.995163
+C-E,S5663; East side of road,Commissary,36.964028,127.003231
+C-W,Signpost; West side of the road,Commissary,36.963908,127.002963
+PX-E,S5725; East side of the road,Main Exchange,36.965533,126.998282
+PX-W,S5653; West side of the road,Main Exchange,36.965613,126.998132
+PO-N,Signpost; North side of the road,Main Post Office,36.963076,127.000019
+PO-S,Signpost; South side of the road,Main Post Office,36.962876,127.000064
+MH-E,S6383; East side of the road,LTG Timothy J. Maude Hall,36.967866,127.005198
+MH-W,Signpost; West side of the road,LTG Timothy J. Maude Hall,36.967849,127.005019
+SG-N,Signpost; North side of the road,Sitman Fitness Center,36.975504,126.993163
+SG-S,Signpost; South side of the road,Sitman Fitness Center,36.975214,126.993224
+2S,Signpost; North side of the road,2ID Sustainment,36.97663,126.989668
 CIF,South side of the road,Central Issue Facility,36.971978,126.987103
 B2E,E,Barracks (6800/6900s),36.97311969,126.9905967
