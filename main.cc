@@ -10,26 +10,16 @@
 using namespace std;
 
 // default constructor
-Stop::Stop() : stop_id(""), desc(""), id(""), name(""), lat(0), lon(0) {};
+Stop::Stop()
+  : id(""), name(""), desc(""), lat(0), lon(0) {};
 
 // actual constructor
-Stop::Stop(string i, string d, string n, string la, string lo) {
-  stop_id = i;
-  id = i + d;
-  name = n;
-  if (d == "") desc = "";
-  else if (d == "N") desc = "Northern roadside";
-  else if (d == "S") desc = "Southern roadside";
-  else if (d == "E") desc = "Eastern roadside";
-  else desc = "Western roadside";
-  lat = stold(la);
-  lon = stold(lo);
-}
+Stop::Stop(string i, string n, string d, string la, string lo)
+  : id(i), name(n), desc(d), lat(stold(la)), lon(stold(lo)) {};
 
 // copy constructor
 Stop::Stop(const Stop& s) {
   id = s.id;
-  stop_id = s.stop_id;
   name = s.name;
   desc = s.desc;
   lat = s.lat;
@@ -39,7 +29,6 @@ Stop::Stop(const Stop& s) {
 // assignment operator
 Stop& Stop::operator=(const Stop& rhs) {
   id = rhs.id;
-  stop_id = rhs.stop_id;
   name = rhs.name;
   desc = rhs.desc;
   lat = rhs.lat;
@@ -68,7 +57,8 @@ int main() {
     vector<string> args;
     string arg;
     while (getline(ss, arg, ',')) args.push_back(arg);
-    stops.insert(Stop(args[0], args[1], args[2], args[3], args[4]));
+    for (auto a : args) cout << a << '\n';
+    stops.insert(Stop(args[0], args[2], args[1], args[3], args[4]));
   }
   ifs.close();
 
