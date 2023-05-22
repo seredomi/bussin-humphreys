@@ -1,7 +1,6 @@
 PG,x,Pedestrian Gate,36.95780096,127.0438492
 PD-E,E,Provider DFAC,36.96407627,127.0383292
 PD-W,W,Provider DFAC,36.96407627,127.0383292
-DT-E,E,Desidero Tower,36.96264037,127.0365954
 DT-W,W,Desidero Tower,36.96264037,127.0365954
 SLQ-N,N,SLQs (12200s),36.96547357,127.0377231
 SLQ-S,S,SLQs (12200s),36.96547357,127.0377231
@@ -17,7 +16,6 @@ TG-E,East side of the road,Turner Fitness Center,36.960703,127.02463
 TG-W,West side of the road,Turner Fitness Center,36.961411,127.024033
 CCF-E,E,Collier Community Fitness Center,36.96067721,127.0245427
 CCF-W,W,Collier Community Fitness Center,36.95350139,127.0217746
-H-S,S,Brian Allgood Army Community Hospital,36.9535137,127.0281047
 H-N,N,Brian Allgood Army Community Hospital,36.9535137,127.0281047
 MP-N,N,Law Enforcement Center,36.95302983,127.0341611
 MP-S,S,Law Enforcement Center,36.95281549,127.0345956
