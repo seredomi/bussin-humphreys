@@ -2,9 +2,13 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <map>
 #include <vector>
 #include <sstream>
 #include <math.h>
+
+#include <chrono>
+#include <ctime>
 
 #include "stop.h"
 #include "route.h"
@@ -39,12 +43,12 @@ Stop& Stop::operator=(const Stop& rhs) {
 bool Stop::operator<(const Stop& rhs) const { return id < rhs.id; }
 
 
-set<Stop> make_stops() {
+set<Stop> make_stops(string filename) {
   set<Stop> stops;
   // open stops.csv, construct stops set
-  ifstream ifs("stops.csv");
+  ifstream ifs(filename);
   if (!ifs) {
-    cout << "Error opening stops.csv\n";
+    cout << "Error opening " << filename << "\n";
     return stops;
   }
   string line;
@@ -62,16 +66,16 @@ set<Stop> make_stops() {
 }
 
 
-vector<Route> make_routes(set<Stop> &stops) {
+vector<Route> make_routes(set<Stop> &stops, string filename) {
   vector<Route> routes;
-  ifstream ifs("routes.csv");
+  ifstream ifs(filename);
   if (!ifs) {
-    cout << "Error opening routes.csv\n";
+    cout << "Error opening " << filename << "\n";
     return routes;
   }
   string line;
   // each line in routes.csv is of the form:
-  // routename,monstart-end freq, tuestart-end freq, ... sunstart-end freq, stop1 stop1time, stop2 stop2time, ...
+  // routename,monstart-end freq, tuestart-end freq, ... ,sunstart-end freq,stop1id time,stop2id time, ...
   // open routes.csv, construct routes vector
   while (getline(ifs, line)) {
     stringstream ss(line);
@@ -88,15 +92,15 @@ vector<Route> make_routes(set<Stop> &stops) {
       r.scheds[d] = sched;
     }
     while (getline(ss, arg, ',')) {
-      if (arg != "" && arg != "\n") {
+      if (true) { // TODO: implement check for trailing commas?
         Stop query(arg.substr(0, arg.find(" "))); 
         auto it = stops.find(query);
         if (it == stops.end()) {
           cout << "Error: " << " route " << r.name << " " << arg.substr(0, arg.find(" ")) << " not found" << '\n';
-
           vector<Route> empty; return empty;
         }
-        r.route_stops.insert(Route::route_stop(*it, arg.substr(arg.find(" ")+1)));
+        r.time_sorted_stops[stoi(arg.substr(arg.find(" ")+1))] = *it;
+        r.id_sorted_stops[*it] = stoi(arg.substr(arg.find(" ")+1));
       }
     }
     routes.push_back(r);
@@ -106,26 +110,78 @@ vector<Route> make_routes(set<Stop> &stops) {
 }
 
 
-// Haversine formula
+bool valid_route(int day, int curr_time, Stop s, Route &r) {
+  return r.id_sorted_stops.find(s) != r.id_sorted_stops.end()
+      && r.scheds[day].start + r.id_sorted_stops[s] <= curr_time
+      && r.scheds[day].end + r.id_sorted_stops[s] >= curr_time;
+}
+
+
+// use Haversine formula to find distance between stops
 double time_bw_pts(Stop &p1, Stop &p2) {
   double dlat = (p2.lat - p1.lat) * M_PI / 180;
   double dlon = (p2.lon - p1.lon) * M_PI / 180;
   // 12.5 is average walking speed m/km, 6371 is radius of earth in km
-  return 2 * 12.5 * 6371 * asin(sqrt(pow(sin((dlat) / 2), 2) + cos(p1.lat) * cos(p2.lat) * pow(sin((dlon) / 2), 2)));
+  return 2 * 12.5 * 6371 *
+    asin(sqrt(pow(sin((dlat) / 2), 2) + cos(p1.lat) * cos(p2.lat) * pow(sin((dlon) / 2), 2)));
 }
+
+// use modified Dijkstra's algorithm to find shortest path between two stops
+set<Stop> find_path(int day, int time, Stop &s1, Stop &s2, set<Stop> all_stops, vector<Route> all_routes) {
+
+  set<Stop> unvisited = all_stops;
+  set<Stop> visited;
+  set<Stop> neighbors;
+  map<Stop, int> times;
+  set<Stop> path;
+
+  for (auto s : all_stops) times[s] = 99999;
+
+  Stop current = s1;
+  times[current] = time;
+
+
+  for (int i = 0; i < 6; ++i) {
+    cout << all_routes[i].name << " " << boolalpha << valid_route(day, time, s1, all_routes[i]) << '\n';
+  }
+  
+//  while (current != s2) {
+//
+//    visited.insert(current);
+//    unvisited.erase(current);
+//
+//    // only routes that are open and contain the current stop should be used
+//    vector<Route> possibleRoutes;
+//    for (auto r : allRoutes)
+//      if (r.route_stops.find(Route::route_stop(current)) != r.route_stops.end()
+//       && r.scheds[day].start+r.route_stops.find(Route::route_stop(current))->time <= time
+//       && r.scheds[day].end+r.route_stops.find(Route::route_stop(current))->time >= time)
+//        possibleRoutes.push_back(r);
+//  }
+
+
+  return path;
+}
+
+
+
+
+  // auto start = chrono::high_resolution_clock::now();
+  // cout << chrono::duration<double, std::milli>(chrono::high_resolution_clock::now() - start).count() << '\n';
 
  
 int main() {
 
-  set<Stop> stops = make_stops();
+  set<Stop> stops = make_stops("stops.csv");
   if (stops.empty()) return 1;
-  vector<Route> routes = make_routes(stops);
+  vector<Route> routes = make_routes(stops, "routes.csv");
   if (routes.empty()) return 1;
+  
 
-  Stop s1 = *stops.find(Stop("PVC-W"));
+  Stop s1 = *stops.find(Stop("H-N"));
   Stop s2 = *stops.find(Stop("PG"));
 
-  cout << time_bw_pts(s1, s2) << '\n';
+  find_path(0, 1173, s1, s2, stops, routes);
 
 
 
