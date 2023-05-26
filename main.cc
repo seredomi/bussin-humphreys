@@ -41,6 +41,7 @@ Stop& Stop::operator=(const Stop& rhs) {
 }
 // less than operator
 bool Stop::operator<(const Stop& rhs) const { return id < rhs.id; }
+bool Stop::operator==(const Stop& rhs) const { return id == rhs.id; }
 
 
 set<Stop> make_stops(string filename) {
@@ -97,7 +98,7 @@ vector<Route> make_routes(set<Stop> &stops, string filename) {
         auto it = stops.find(query);
         if (it == stops.end()) {
           cout << "Error: " << " route " << r.name << " " << arg.substr(0, arg.find(" ")) << " not found" << '\n';
-          vector<Route> empty; return empty;
+          routes.clear(); return routes;
         }
         r.time_sorted_stops[stoi(arg.substr(arg.find(" ")+1))] = *it;
         r.id_sorted_stops[*it] = stoi(arg.substr(arg.find(" ")+1));
@@ -110,55 +111,114 @@ vector<Route> make_routes(set<Stop> &stops, string filename) {
 }
 
 
+// check stop is in route, and that route is running on day and at time
 bool valid_route(int day, int curr_time, Stop s, Route &r) {
   return r.id_sorted_stops.find(s) != r.id_sorted_stops.end()
       && r.scheds[day].start + r.id_sorted_stops[s] <= curr_time
       && r.scheds[day].end + r.id_sorted_stops[s] >= curr_time;
 }
 
+int next_time(int day, int curr_time, Stop s, Route &r) {
 
-// use Haversine formula to find distance between stops
+  int dep_time = r.scheds[day].start + r.id_sorted_stops[s.id];
+  while (dep_time < curr_time) dep_time += r.scheds[day].freq;
+  return dep_time;
+
+}
+
+
+// use Haversine formula to find walking time between stops
 double time_bw_pts(Stop &p1, Stop &p2) {
   double dlat = (p2.lat - p1.lat) * M_PI / 180;
   double dlon = (p2.lon - p1.lon) * M_PI / 180;
-  // 12.5 is average walking speed m/km, 6371 is radius of earth in km
+  // 12.5 is average walking speed min/km, 6371 is radius of earth in km
   return 2 * 12.5 * 6371 *
     asin(sqrt(pow(sin((dlat) / 2), 2) + cos(p1.lat) * cos(p2.lat) * pow(sin((dlon) / 2), 2)));
 }
 
 // use modified Dijkstra's algorithm to find shortest path between two stops
-set<Stop> find_path(int day, int time, Stop &s1, Stop &s2, set<Stop> all_stops, vector<Route> all_routes) {
+vector<Stop> find_path(int day, int curr_time, Stop &s1, Stop &s2, set<Stop> all_stops, vector<Route> all_routes) {
 
   set<Stop> unvisited = all_stops;
   set<Stop> visited;
-  set<Stop> neighbors;
   map<Stop, int> times;
-  set<Stop> path;
+  map<Stop, Stop> prevs;
+
+  vector<Stop> path;
 
   for (auto s : all_stops) times[s] = 99999;
 
   Stop current = s1;
-  times[current] = time;
+  times[current] = curr_time;
+
+  
+  cout << "current: " << current.name << '\n';
+
+  while (!unvisited.empty()) {
+
+    if (current == s2) break; // exit if we've reached the destination
+
+    // only routes that are open and contain the current stop should be used
+    vector<Route> possible_routes;
+    for (auto r : all_routes)
+      if (r.id_sorted_stops.find(Stop(current.id)) != r.id_sorted_stops.end())
+        possible_routes.push_back(r);
+
+    cout << "num routes: " << possible_routes.size() << '\n';
 
 
-  for (int i = 0; i < 6; ++i) {
-    cout << all_routes[i].name << " " << boolalpha << valid_route(day, time, s1, all_routes[i]) << '\n';
+    // for each route, find the next stop and add it to neighbors
+    for (auto r : possible_routes) {
+      auto it = r.time_sorted_stops.begin();
+      while (it->second != current) ++it;
+      int test_dep_time = next_time(day, curr_time, it->second, r);
+      // cout << it->first << ' ' << it->second.id << '\n';
+      //if (current.id == "MH-W") {
+      //  cout << (++it)->second << endl;
+      //  for (auto uv : unvisited) cout << uv.id << '\n';
+      //}
+
+      
+      // if this stop isnt last and the next stop is unvisited
+      if (++it != r.time_sorted_stops.end() && unvisited.find(it->second) != unvisited.end()) {
+        // cout << "TEST!!\n";
+        // calculate time to get to next stop, including waiting
+        test_dep_time += (it->first - (--it)->first); ++it;
+        //int dep_time = r.scheds[day].start + (--it)->first; ++it;
+        //// cout << "dt: " << dep_time << " ct: " << curr_time << '\n';
+        //while (dep_time < curr_time) dep_time += r.scheds[day].freq;
+        //int tot_time = times[current] + (dep_time - curr_time) + (it->first - (--it)->first); ++it;
+        if (test_dep_time < times[it->second]) {
+          times[it->second] = test_dep_time;
+          prevs[it->second] = current;
+        } 
+      }
+    }
+
+
+    unvisited.erase(current);
+    // cout << "unvisited:\n";
+    // for (auto s : unvisited) cout << "  " << s.name << " / " << times[s] << '\n';
+    // find unvisited stop with smallest time
+    current = *unvisited.begin();
+    for (auto s : unvisited) if (times[s] < times[current]) current = s;
+    curr_time = times[current];
+
+    cout << "current: " << current.name << '\n';
+    
   }
   
-//  while (current != s2) {
-//
-//    visited.insert(current);
-//    unvisited.erase(current);
-//
-//    // only routes that are open and contain the current stop should be used
-//    vector<Route> possibleRoutes;
-//    for (auto r : allRoutes)
-//      if (r.route_stops.find(Route::route_stop(current)) != r.route_stops.end()
-//       && r.scheds[day].start+r.route_stops.find(Route::route_stop(current))->time <= time
-//       && r.scheds[day].end+r.route_stops.find(Route::route_stop(current))->time >= time)
-//        possibleRoutes.push_back(r);
-//  }
 
+  // troubleshooting
+  cout << '\n';
+  for (auto t : times) if (t.second != 99999) cout << (t.first).name << ' ' << t.second << '\n';
+  cout << '\n';
+
+  // construct path from prevs
+  while (current != s1) {
+    path.push_back(current);
+    current = prevs[current];
+  }
 
   return path;
 }
@@ -172,16 +232,26 @@ set<Stop> find_path(int day, int time, Stop &s1, Stop &s2, set<Stop> all_stops, 
  
 int main() {
 
+  cout.precision(10);
+
   set<Stop> stops = make_stops("stops.csv");
   if (stops.empty()) return 1;
   vector<Route> routes = make_routes(stops, "routes.csv");
   if (routes.empty()) return 1;
+
+  vector<Route> temp_routes;
+  temp_routes.push_back(routes[0]);
+  temp_routes.push_back(routes[2]);
+
+  Stop query("PVC-E");
+  Stop s1 = *stops.find(query);
+  query = Stop("PD-N");
+  Stop s2 = *stops.find(query);
+  
+  vector<Stop> path = find_path(1, 560, s1, s2, stops, temp_routes);
+  for (auto s : path) cout << s.name << ' ' << '\n';
   
 
-  Stop s1 = *stops.find(Stop("H-N"));
-  Stop s2 = *stops.find(Stop("PG"));
-
-  find_path(0, 1173, s1, s2, stops, routes);
 
 
 
