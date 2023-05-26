@@ -1,48 +1,20 @@
-#include <fstream>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <set>
 #include <map>
 #include <vector>
-#include <sstream>
 #include <math.h>
-
 #include <chrono>
 #include <ctime>
 
-#include "stop.h"
 #include "route.h"
+#include "route.cc"
+#include "action.h"
+#include "action.cc"
 
 using namespace std;
-
-// ---- stop stuff -------
-// ctors
-Stop::Stop()
-  : id(""), name(""), desc(""), lat(0), lon(0) {};
-Stop::Stop(string i) : id(i), name(""), desc(""), lat(0), lon(0) {};
-Stop::Stop(string i, string n, string d, string la, string lo)
-  : id(i), name(n), desc(d), lat(stold(la)), lon(stold(lo)) {};
-// copy constructor
-Stop::Stop(const Stop& s) {
-  id = s.id;
-  name = s.name;
-  desc = s.desc;
-  lat = s.lat;
-  lon = s.lon;
-}
-// assignment operator
-Stop& Stop::operator=(const Stop& rhs) {
-  id = rhs.id;
-  name = rhs.name;
-  desc = rhs.desc;
-  lat = rhs.lat;
-  lon = rhs.lon;
-  return *this;
-}
-// less than operator
-bool Stop::operator<(const Stop& rhs) const { return id < rhs.id; }
-bool Stop::operator==(const Stop& rhs) const { return id == rhs.id; }
-
 
 set<Stop> make_stops(string filename) {
   set<Stop> stops;
@@ -252,6 +224,8 @@ int main() {
   for (auto s : path) cout << s.name << ' ' << '\n';
   
 
+  Action a = Action("get on green route", s1, 5, 5);
+  cout << a << '\n';
 
 
 

@@ -18,12 +18,9 @@ class Stop {
     Stop & operator=(const Stop&);
     bool operator<(const Stop&) const;
     bool operator==(const Stop&) const;
-    bool operator!=(const Stop& rhs) const { return !(*this == rhs); }
+    bool operator!=(const Stop& rhs) const;
 };
 
-std::ostream& operator<<(std::ostream& os, const Stop& s) {
-  os << s.id << " " << s.name << " " << s.desc << " " << s.lat << " " << s.lon;
-  return os;
-}
+std::ostream& operator<<(std::ostream& os, const Stop& s);
 
 #endif
