@@ -109,28 +109,31 @@ double time_bw_pts(Stop &p1, Stop &p2) {
 }
 
 // use modified Dijkstra's algorithm to find shortest path between two stops
-vector<Stop> find_path(int day, int curr_time, Stop &s1, Stop &s2, set<Stop> all_stops, vector<Route> all_routes) {
+Action_Tree find_path(int day, int curr_time, Stop &s1, Stop &s2, set<Stop> all_stops, vector<Route> all_routes) {
 
   set<Stop> unvisited = all_stops;
   set<Stop> visited;
-  map<Stop, int> times;
+  map<Stop, pair<int, Action*>> times;
   map<Stop, Stop> prevs;
+
+  Action* root = new Action("", "", s1, 0);
+  Action_Tree paths(root);
+  Action* curr_action = root;
 
   vector<Stop> path;
 
-  for (auto s : all_stops) times[s] = 99999;
+  for (auto s : all_stops) times[s].first = 99999;
 
   Stop current = s1;
-  times[current] = curr_time;
+  times[current].first = curr_time;
 
-  
   cout << "current: " << current.name << '\n';
 
   while (!unvisited.empty()) {
 
-    if (current == s2) break; // exit if we've reached the destination
+    // if (current == s2) break; // exit if we've reached the destination
 
-    // only routes that are open and contain the current stop should be used
+    // only routes that contain the current stop should be considered
     vector<Route> possible_routes;
     for (auto r : all_routes)
       if (r.id_sorted_stops.find(Stop(current.id)) != r.id_sorted_stops.end())
@@ -138,68 +141,65 @@ vector<Stop> find_path(int day, int curr_time, Stop &s1, Stop &s2, set<Stop> all
 
     cout << "num routes: " << possible_routes.size() << '\n';
 
-
     // for each route, find the next stop and add it to neighbors
     for (auto r : possible_routes) {
       auto it = r.time_sorted_stops.begin();
       while (it->second != current) ++it;
-      int test_dep_time = next_time(day, curr_time, it->second, r);
-      // cout << it->first << ' ' << it->second.id << '\n';
-      //if (current.id == "MH-W") {
-      //  cout << (++it)->second << endl;
-      //  for (auto uv : unvisited) cout << uv.id << '\n';
-      //}
-
       
       // if this stop isnt last and the next stop is unvisited
       if (++it != r.time_sorted_stops.end() && unvisited.find(it->second) != unvisited.end()) {
-        // cout << "TEST!!\n";
         // calculate time to get to next stop, including waiting
-        test_dep_time += (it->first - (--it)->first); ++it;
-        //int dep_time = r.scheds[day].start + (--it)->first; ++it;
-        //// cout << "dt: " << dep_time << " ct: " << curr_time << '\n';
-        //while (dep_time < curr_time) dep_time += r.scheds[day].freq;
-        //int tot_time = times[current] + (dep_time - curr_time) + (it->first - (--it)->first); ++it;
-        if (test_dep_time < times[it->second]) {
-          times[it->second] = test_dep_time;
-          prevs[it->second] = current;
+        int test_dep_time = next_time(day, curr_time, it->second, r); // gets next dep time for this route
+        test_dep_time += (it->first - (--it)->first); ++it;           // add time to get to next stop
+        // if this is the fastest way to get to this stop, update times, add to paths
+        if (test_dep_time < times[it->second].first) {  
+          times[it->second].first = test_dep_time;
+          if (curr_action->route != r.name) {
+            Action na("Get off", curr_action->route, it->second, 0);
+            curr_action->add_child(&na);
+            Action nna("Get on", r.name, it->second, test_dep_time);
+            na.add_child(&nna);
+            curr_action = &nna;
+          }
+          else {
+            Action na("Stay on", r.name, it->second, test_dep_time);
+            curr_action->add_child(&na);
+            curr_action = &na;
+          }
+          times[it->second].first = test_dep_time;
+          times[it->second].second = curr_action;
         } 
       }
     }
 
-
     unvisited.erase(current);
-    // cout << "unvisited:\n";
-    // for (auto s : unvisited) cout << "  " << s.name << " / " << times[s] << '\n';
-    // find unvisited stop with smallest time
     current = *unvisited.begin();
-    for (auto s : unvisited) if (times[s] < times[current]) current = s;
-    curr_time = times[current];
+    for (auto s : unvisited) if (times[s].first < times[current].first) current = s;
+    curr_time = times[current].first;
+
+    curr_action = paths.find_action(current.id);
 
     cout << "current: " << current.name << '\n';
-    
   }
   
-
   // troubleshooting
   cout << '\n';
-  for (auto t : times) if (t.second != 99999) cout << (t.first).name << ' ' << t.second << '\n';
+  for (auto t : times) if (t.second.first != 99999) cout << t.first.name << ' ' << t.second.first << '\n';
   cout << '\n';
 
-  // construct path from prevs
-  while (current != s1) {
-    path.push_back(current);
-    current = prevs[current];
-  }
+  // // construct path from prevs
+  // while (current != s1) {
+  //   path.push_back(current);
+  //   current = prevs[current];
+  // }
 
-  return path;
+  // return path;
+  return paths;
 }
 
 
 
 
-  // auto start = chrono::high_resolution_clock::now();
-  // cout << chrono::duration<double, std::milli>(chrono::high_resolution_clock::now() - start).count() << '\n';
 
  
 int main() {
@@ -220,14 +220,50 @@ int main() {
   query = Stop("PD-N");
   Stop s2 = *stops.find(query);
   
-  vector<Stop> path = find_path(1, 560, s1, s2, stops, temp_routes);
-  for (auto s : path) cout << s.name << ' ' << '\n';
+  Action_Tree path = find_path(1, 560, s1, s2, stops, routes);
+  path.print_tree();
   
 
-  Action a = Action("get on green route", s1, 5, 5);
-  cout << a << '\n';
+  Action a = Action("a", "", s1, 5);
+  Action b = Action("b", "", s1, 5);
+  Action c = Action("c", "", s1, 5);
+  Action d = Action("d", "", s1, 5);
+  Action e = Action("e", "", s1, 5);
+  Action f = Action("f", "", s1, 5);
+  Action h = Action("h", "", s1, 5);
+  Action i = Action("i", "", s1, 5);
+  Action j = Action("j", "", s1, 5);
+  Action l = Action("l", "", s1, 5);
+  Action m = Action("m", "", s1, 5);
+  Action n = Action("n", "", s1, 5);
+  Action o = Action("o", "", s1, 5);
+  Action p = Action("p", "", s1, 5);
+  Action q = Action("q", "", s1, 5);
+
+  Action_Tree at = Action_Tree(&a);
+  a.add_child(&b);
+  a.add_child(&c);
+  a.add_child(&d);
+  b.add_child(&e);
+  b.add_child(&f);
+  c.add_child(&h);
+  c.add_child(&i);
+  c.add_child(&j);
+  d.add_child(&l);
+  h.add_child(&m);
+  l.add_child(&n);
+  m.add_child(&o);
+  n.add_child(&p);
+  n.add_child(&q);
+
+  at.print_tree();
+
 
 
 
   return 0;
 }
+  
+// in case i need to time anytghind
+  // auto start = chrono::high_resolution_clock::now();
+  // cout << chrono::duration<double, std::milli>(chrono::high_resolution_clock::now() - start).count() << '\n';
