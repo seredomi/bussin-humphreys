@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include "stop.h"
 
@@ -19,10 +20,10 @@ class Action {
     Stop stop;
     int time;
 
-    Action *parent;
-    vector<Action*> children;
+    shared_ptr<Action> parent;
+    vector<shared_ptr<Action>> children;
 
-    void add_child(Action*);
+    void add_child(shared_ptr<Action>);
     void print_below();
 };
 
@@ -31,9 +32,9 @@ std::ostream & operator<<(std::ostream &, const Action &);
 class Action_Tree {
   public:
     Action_Tree();
-    Action_Tree(Action *);
+    Action_Tree(shared_ptr<Action>);
 
-    Action *root;
+    shared_ptr<Action> root;
 
     void print_tree();
 
